@@ -1,79 +1,10 @@
-; ****************** BEGIN INITIALIZATION FOR ACL2s MODE ****************** ;
-; (Nothing to see here!  Your actual file is after this initialization code);
-(make-event
- (er-progn
-  (set-deferred-ttag-notes t state)
-  (value '(value-triple :invisible))))
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading the CCG book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/ccg/ccg" :uncertified-okp nil :dir :system :ttags ((:ccg)) :load-compiled-file nil);v4.0 change
-
-;Common base theory for all modes.
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s base theory book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/base-theory" :dir :system :ttags :all)
-
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/custom" :dir :system :ttags :all)
-
-;; guard-checking-on is in *protected-system-state-globals* so any
-;; changes are reverted back to what they were if you try setting this
-;; with make-event. So, in order to avoid the use of progn! and trust
-;; tags (which would not have been a big deal) in custom.lisp, I
-;; decided to add this here.
-;; 
-;; How to check (f-get-global 'guard-checking-on state)
-;; (acl2::set-guard-checking :nowarn)
-(acl2::set-guard-checking :all)
-
-;Settings common to all ACL2s modes
-(acl2s-common-settings)
-;(acl2::xdoc acl2s::defunc) ;; 3 seconds is too much time to spare -- commenting out [2015-02-01 Sun]
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem loading ACL2s customizations book.~%Please choose \"Recertify ACL2s system books\" under the ACL2s menu and retry after successful recertification.") (value :invisible))
-(include-book "acl2s/acl2s-sigs" :dir :system :ttags :all)
-
-#+acl2s-startup (er-progn (assign fmt-error-msg "Problem setting up ACL2s mode.") (value :invisible))
-
-(acl2::xdoc acl2s::defunc) ; almost 3 seconds
-
-; Non-events:
-;(set-guard-checking :none)
-
-(set-inhibit-warnings! "Invariant-risk" "theory")
-
-(in-package "ACL2")
-(redef+)
-(defun print-ttag-note (val active-book-name include-bookp deferred-p state)
-  (declare (xargs :stobjs state)
-	   (ignore val active-book-name include-bookp deferred-p))
-  state)
-
-(defun print-deferred-ttag-notes-summary (state)
-  (declare (xargs :stobjs state))
-  state)
-
-(defun notify-on-defttag (val active-book-name include-bookp state)
-  (declare (xargs :stobjs state)
-	   (ignore val active-book-name include-bookp))
-  state)
-(redef-)
-
-(acl2::in-package "ACL2S")
-
-; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
-;$ACL2s-SMode$;ACL2s
 (defdata person (cons symbol nat))
 (defdata famTree (oneof person (list famTree person famTree)))
-
- 
 
 (personp '(Jason . 1985))  
 (famTreep '(Jason . 1985))
 (famTreep '((Tammy . 1969) (Jason . 1985) (Alan . 1968)))
 (famTreep '((Tammy . 1969) (Jason . 1985) ((Glenn . 1930) (Alan . 1968) (Liz . 1932))))
-
- 
 
 ;; getRootYear: famTree -> int
 ;;
@@ -82,9 +13,7 @@
    ((personp ft) (rest ft))
    ((famTreep ft) (rest (second ft)))))
 
- 
-
-;; validFamTreep: framTree -> bool
+;; validFamTreep: famTree -> bool
 ;; Return true if the given famTree is a valid famTree
 (definec validFamTreep (ft :famTree) :bool
   (cond
@@ -94,7 +23,7 @@
                        (< (getRootYear (first ft)) (rest (second ft)))
                        (< (getRootYear (third ft)) (rest (second ft)))))))
 
-Proof:
+;; Proof:
 (defthm project2 (implies (and (validFamTreep a) 
                                (validFamTreep b) 
                                (natp YoB)
@@ -137,13 +66,14 @@ Proof:
               (symbolp name)
               (implies
                (and 
-                (< (getRootYear (first a)) (rest (second a)))
-                (< (getRootYear (third a)) (rest (second a)))
-                (< (getRootYear (first b)) (rest (second b)))
-                (< (getRootYear (third b)) (rest (second b))))
-               (and
-                (validFamTreep (list (first a) (second a) (third a)))
-                (validFamTreep (list (first b) (second b) (third b))))))
+                (< (getRootYear (first a)) YoB)
+                (< (getRootYear (third a)) YoB))
+                (validFamTreep (list (first a) (cons name YoB) (third a))))
+			  (implies
+               (and 
+                (< (getRootYear (first b)) YoB)
+                (< (getRootYear (third b)) YoB))
+                (validFamTreep (list (first b) (cons name YoB) (third b)))))
          (implies (and (< (getRootYear a) YoB)
                        (< (getRootYear b) YoB))
                   (validFamTreep (list a (cons name YoB) b))))
@@ -246,7 +176,7 @@ Proof:
       (rest (second (list a (cons name YoB) b))))
    (< (getRootYear (third (list a (cons name YoB) b))) 
       (rest (second (list a (cons name YoB) b)))))))
-= { if-axioms, D2 }
+= { if axioms, D2 }
 (and 
    (validFamTreep (first (list a (cons name YoB) b)))
    (validFamTreep (third (list a (cons name YoB) b)))
@@ -276,7 +206,7 @@ Proof:
                      (< (getRootYear (third b)) (rest (second b))))))
  (< (getRootYear a) YoB)
  (< (getRootYear b) YoB))
-= { if-axioms, C3, C4 }
+= { if axioms, C3, C4 }
 (and 
  t
  t
@@ -303,13 +233,14 @@ Problem 1c:
               (symbolp name)
               (implies
                (and 
-                (< (getRootYear (first a)) (rest (second a)))
-                (< (getRootYear (third a)) (rest (second a)))
-                (< (getRootYear (first b)) (rest (second b)))
-                (< (getRootYear (third b)) (rest (second b))))
-               (and
-                (validFamTreep (list (first a) (second a) (third a)))
-                (validFamTreep (list (first b) (second b) (third b))))))
+                (< (getRootYear (first a)) YoB)
+                (< (getRootYear (third a)) YoB))
+                (validFamTreep (list (first a) (cons name YoB) (third a))))
+			  (implies
+               (and 
+                (< (getRootYear (first b)) YoB)
+                (< (getRootYear (third b)) YoB))
+                (validFamTreep (list (first b) (cons name YoB) (third b)))))
          (implies (and (< (getRootYear a) YoB)
                        (< (getRootYear b) YoB))
                   (validFamTreep (list a (cons name YoB) b))))
@@ -323,13 +254,14 @@ Exportation:
               (symbolp name)
               (implies
                (and 
-                (< (getRootYear (first a)) (rest (second a)))
-                (< (getRootYear (third a)) (rest (second a)))
-                (< (getRootYear (first b)) (rest (second b)))
-                (< (getRootYear (third b)) (rest (second b))))
-               (and
-                (validFamTreep (list (first a) (second a) (third a)))
-                (validFamTreep (list (first b) (second b) (third b)))))
+                (< (getRootYear (first a)) YoB)
+                (< (getRootYear (third a)) YoB))
+                (validFamTreep (list (first a) (cons name YoB) (third a))))
+			  (implies
+               (and 
+                (< (getRootYear (first b)) YoB)
+                (< (getRootYear (third b)) YoB))
+                (validFamTreep (list (first b) (cons name YoB) (third b))))
               (< (getRootYear a) YoB)
               (< (getRootYear b) YoB))
          (validFamTreep (list a (cons name YoB) b)))
@@ -342,16 +274,17 @@ C4. (not (personp b))
 C5. (natp YoB)
 C6. (symbolp name)
 C7. (implies
-     (and 
-      (< (getRootYear (first a)) (rest (second a)))
-      (< (getRootYear (third a)) (rest (second a)))
-      (< (getRootYear (first b)) (rest (second b)))
-      (< (getRootYear (third b)) (rest (second b))))
-     (and
-      (validFamTreep (list (first a) (second a) (third a)))
-      (validFamTreep (list (first b) (second b) (third b)))))
-C8. (< (getRootYear a) YoB)
-C9. (< (getRootYear b) YoB)
+		(and 
+		(< (getRootYear (first a)) YoB)
+        (< (getRootYear (third a)) YoB))
+        (validFamTreep (list (first a) (cons name YoB) (third a))))
+C8. (implies
+		(and 
+        (< (getRootYear (first b)) YoB)
+        (< (getRootYear (third b)) YoB))
+        (validFamTreep (list (first b) (cons name YoB) (third b))))
+C9. (< (getRootYear a) YoB)
+C10. (< (getRootYear b) YoB)
 
 Derived Context:
 D1. (personp (cons name YoB)) { Def person }
@@ -431,7 +364,7 @@ Proof:
 (and
  (validFamTreep (first a))
  (validFamTreep (third a))
- (validFamTreep (first b))
+ (validFamTreep (first b)) 
  (validFamTreep (third b))
  (< (getRootYear (first a)) (rest (second a)))
  (< (getRootYear (third a)) (rest (second a)))
@@ -443,9 +376,151 @@ Proof:
  (validFamTreep (third a))
  (validFamTreep (first b))
  (validFamTreep (third b))
- (validFamTreep (list (first a) (second a) (third a)))
- (validFamTreep (list (first b) (second b) (third b))))
+ (validFamTreep (list (first a) (cons name YoB) (third a)))
+ (validFamTreep (list (first b) (cons name YoB) (third b))))
 ;; stuckkkkkkkkk
+
+Lemma Root-to-Rest-Second:
+(implies
+	(and (validFamTreep a)
+		 (not (personp a)))
+	(equal (getRootYear a)
+		   (rest (second a))))
+
+;; Proof Obligations
+;; Contract Case
+(implies
+	(not (validFamTreep a))
+	(implies
+		(and 
+			(validFamTreep a)
+			(not (personp a)))
+	(equal (getRootYear a)
+		(rest (second a)))))
+;; Base Case
+(implies
+	(and 
+		(personp (first a))
+		(personp (third a)))
+	(implies
+		(and 
+			(validFamTreep a)
+			(not (personp a)))
+		(equal (getRootYear a)
+		(rest (second a)))))
+
+;; Inductive Case
+(implies
+	(and 
+		(validFamTreep (first a))
+		(validFamTreep (third a))
+		(not (personp (first a)))
+		(not (personp (third a)))
+		(implies
+			(and 
+				(validFamTreep (first a))
+				(not (personp (first a))))
+			(equal (getRootYear (first a))
+			(rest (second (first a)))))
+		(implies
+			(and 
+				(validFamTreep (third a))
+				(not (personp (third a))))
+			(equal (getRootYear (third a))
+			(rest (second (third a))))))
+	(implies
+		(and 
+			(validFamTreep a)
+			(not (person a)))
+		(equal (getRootYear a)
+		(rest (second a)))))
+	
+;; Contract Case	
+Problem 2a:
+(implies
+	(not (validFamTreep a))
+	(implies
+		(and 
+			(validFamTreep a)
+			(not (personp a)))
+	(equal (getRootYear a)
+		(rest (second a)))))
+
+Exportation:
+(implies
+	(and
+		(not (validFamTreep a))
+		(validFamTreep a)
+		(not (personp a)))
+	(equal 
+		(getRootYear a)
+		(rest (second a))))
+
+Context:
+C1. (not (validFamTreep a))
+C2. (validFamTreep a)
+C3. (not (personp a))
+
+Derived Context:
+D1. nil { C1, C2 }
+
+QED
+
+Problem 2b:
+(implies
+	(and 
+		(personp (first a))
+		(personp (third a)))
+	(implies
+		(and 
+			(validFamTreep a)
+			(not (personp a)))
+		(equal 
+		(getRootYear a)
+		(rest (second a)))))
+
+Exportation:
+(implies
+	(and 
+		(personp (first a))
+		(personp (third a))
+		(validFamTreep a)
+		(not (personp a)))
+	(equal 
+		(getRootYear a)
+		(rest (second a))))
+
+Context:
+C1. (personp (first a))
+C2. (personp (third a))
+C3. (validFamTreep a)
+C4. (not (personp a))
+
+Derived Context:
+D1. (famTreep a) { C3, C4 }
+
+Goal:
+(equal 
+	(getRootYear a)
+	(rest (second a)))
+
+Proof:
+(getRootYear a)
+= { Def getRootYear }
+(cond
+   ((personp a) (rest a))
+   ((famTreep a) (rest (second a))))
+= { D1 }
+(rest (second a))
+QED
+
+
+
+
+
+
+
+
 
 
 
