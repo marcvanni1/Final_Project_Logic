@@ -295,10 +295,10 @@ D5. (famtreep (first b)) { C3, Def famtree }
 D6. (famtreep (third b)) { C3, Def famtree }
 D7. (and 
 		(validFamTreep (first a))
-		(validFamTreep (third a))) { Validfamtreep-first-third, C1 }
+		(validFamTreep (third a))) { Lemma Validfamtreep-first-third, C1 }
 D8. (and 
 		(validFamTreep (first b))
-		(validFamTreep (third b))) { Validfamtreep-first-third, C2 }
+		(validFamTreep (third b))) { Lemma Validfamtreep-first-third, C2 }
 
 Goal:
 (validFamTreep (list a (cons name YoB) b))
@@ -404,7 +404,7 @@ Proof:
 	(< (getRootYear (third a)) YoB)
 	(< (getRootYear (first b)) YoB)
 	(< (getRootYear (third b)) YoB))
-{ C9, C10, Lemma fam-tree-root-year, MP }
+= { C9, C10, Lemma fam-tree-root-year, MP }
 (and 
 	t
 	t
@@ -454,7 +454,7 @@ Context:
 C1. (natp YoB)
 C2. (validFamTreep a)
 C3. (not (personp a))
-C4. (< (getRootYear a) YoB))
+C4. (< (getRootYear a) YoB)
 
 Derived Context:
 D1. (famtreep a) { C2, C3 }
