@@ -25,7 +25,9 @@
 
 ;; Proof:
 (defthm project2 (implies (and (validFamTreep a) 
-                               (validFamTreep b) 
+                               (validFamTreep b)
+							   (famTreep a) 
+                               (famTreep b) 
                                (natp YoB)
                                (symbolp name))
                           (implies (and (< (getRootYear a) YoB)
@@ -34,12 +36,12 @@
 
 ;; Proof obligations
 ;; Contract Case
-(implies (and (not (validFamTreep a))
-              (not (validFamTreep b)) 
-              (not (natp YoB))
-              (not (symbolp name)))
+(implies (and (not (famTreep a))
+              (not (famTreep b)))
          (implies (and (validFamTreep a) 
-                       (validFamTreep b) 
+                       (validFamTreep b)
+					   (famTreep a) 
+					   (famTreep b) 
                        (natp YoB)
                        (symbolp name))
                   (implies (and (< (getRootYear a) YoB)
@@ -85,12 +87,12 @@
 
 ;;Proof Contract Case:
 Problem 1a:
-(implies (and (not (validFamTreep a))
-              (not (validFamTreep b)) 
-              (not (natp YoB))
-              (not (symbolp name)))
+(implies (and (not (famTreep a))
+              (not (famTreep b)))
          (implies (and (validFamTreep a) 
-                       (validFamTreep b) 
+                       (validFamTreep b)
+					   (famtreep a)
+					   (famtreep b)					   
                        (natp YoB)
                        (symbolp name))
                   (implies (and (< (getRootYear a) YoB)
@@ -98,12 +100,12 @@ Problem 1a:
                            (validFamTreep (list a (cons name YoB) b)))))
 
 Exportation:
-(implies (and (not (validFamTreep a))
-              (not (validFamTreep b)) 
-              (not (natp YoB))
-              (not (symbolp name))
+(implies (and (not (famTreep a))
+              (not (famTreep b))
               (validFamTreep a) 
               (validFamTreep b) 
+			  (famtreep a)
+			  (famtreep b)
               (natp YoB)
               (symbolp name)
               (< (getRootYear a) YoB)
@@ -111,20 +113,19 @@ Exportation:
          (validFamTreep (list a (cons name YoB) b)))
 
 Context:
-C1. (not (validFamTreep a))
-C2. (not (validFamTreep b)) 
-C3. (not (natp YoB))
-C4. (not (symbolp name))
+C1. (not (famTreep a))
+C2. (not (famTreep b)) 
 C5. (validFamTreep a) 
 C6. (validFamTreep b) 
 C7. (natp YoB)
 C8. (symbolp name)
 C9. (< (getRootYear a) YoB)
 C10. (< (getRootYear b) YoB)
+C11. (famTreep a)
+C12. (famTreep b)
 
 Derived Context:
-D1. nil { C1, C2, C3, C4, C5, C6, C7, C8 }
-
+D1. nil { C1, C2, C11, C12 }
 QED
 
 ;; Proof Base Case
@@ -228,7 +229,7 @@ Proof:
  t
  t
  t)
-= { MP, arith }
+= { PL, arith }
 t
 
 QED
@@ -260,6 +261,8 @@ Exportation:
               (validFamTreep b)
               (not (personp a))
               (not (personp b))
+			  (famtreep a)
+			  (famtreep b)
               (natp YoB)
               (symbolp name)
               (implies
@@ -295,14 +298,16 @@ C8. (implies
         (validFamTreep (list (first b) (cons name YoB) (third b))))
 C9. (< (getRootYear a) YoB)
 C10. (< (getRootYear b) YoB)
+C11. (famtreep a)
+C12. (famtreep b)
 
 Derived Context:
 D1. (personp (cons name YoB)) { Def person }
 D2. (famtreep (list a (cons name YoB) b)) { Def famtree }
 D3. (famtreep (first a)) { C3, Def famtree }
 D4. (famtreep (third a)) { C3, Def famtree }
-D5. (famtreep (first b)) { C3, Def famtree }
-D6. (famtreep (third b)) { C3, Def famtree }
+D5. (famtreep (first b)) { C4, Def famtree }
+D6. (famtreep (third b)) { C4, Def famtree }
 D7. (and 
 		(validFamTreep (first a))
 		(validFamTreep (third a))) { Lemma Validfamtreep-first-third, C1 }
@@ -338,7 +343,7 @@ Proof:
  (validFamTreep b)
  t
  t)
-= { MP, Arith }
+= { PL, Arith }
 (and
  (validFamTreep a)
  (validFamTreep b))
