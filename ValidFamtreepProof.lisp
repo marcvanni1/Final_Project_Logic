@@ -438,7 +438,8 @@ Lemma fam-tree-root-year:
 	(and
 	(natp YoB)
 	(validFamTreep a)
-	(not (personp a)))
+	(not (personp a))
+	(famtreep a))
 		(implies 
 			(< (getRootYear a) YoB)
 				(and 
@@ -530,7 +531,8 @@ Lemma Root-to-Rest-Second:
 Problem 3:
 (implies
 	(and (validFamTreep a)
-		 (not (personp a)))
+		 (not (personp a))
+		 (famtreep a))
 	(equal (getRootYear a)
 		   (rest (second a))))
 
@@ -558,8 +560,10 @@ QED
 ;; its first and third are also validFamTreep
 Lemma validFamTreep-first-third:
 (implies
+	(and
 	(validFamTreep a)
-	(not (personp a))
+	(famtreep a)
+	(not (personp a)))
 	(and
 		(validFamTreep (first a))
 		(validFamTreep (third a))))
