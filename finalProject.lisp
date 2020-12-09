@@ -63,6 +63,8 @@
 
 ; ******************* END INITIALIZATION FOR ACL2s MODE ******************* ;
 ;$ACL2s-SMode$;ACL2s
+
+Marc Vanni, Kelli Therrien, Nan Chen, Yousuf Khan
 (defdata person (cons symbol nat))
 (defdata famTree (oneof person (list famTree person famTree)))
 
