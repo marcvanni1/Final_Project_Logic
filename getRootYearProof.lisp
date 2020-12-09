@@ -1,3 +1,4 @@
+Marc Vanni, Kelli Therrien, Nan Chen, Yousuf Khan
 (defdata person (cons symbol nat))
 (defdata famTree (oneof person (list famTree person famTree)))
 
