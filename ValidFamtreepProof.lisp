@@ -429,6 +429,8 @@ Proof:
 t
 QED
 
+;; Given validFamTree a that's not a person and getRootYear of a is less than the YoB,
+;; getRootYear of first of a and third of a are both less than the YoB
 Lemma fam-tree-root-year:
 
 (implies 
@@ -514,6 +516,8 @@ Proof:
 t
 QED
 
+;; Given validFamTreep a that's not a person, the getRootYear of a is
+;; equal to the rest of the second of a
 Lemma Root-to-Rest-Second:
 (implies
 	(and (validFamTreep a)
@@ -549,6 +553,8 @@ Proof:
 (rest (second a))
 QED
 
+;; Given validFamTreep a that's not a person, 
+;; its first and third are also validFamTreep
 Lemma validFamTreep-first-third:
 (implies
 	(validFamTreep a)
