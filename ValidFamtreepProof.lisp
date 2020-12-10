@@ -7,8 +7,8 @@ Marc Vanni, Kelli Therrien, Nan Chen, Yousuf Khan
 (famTreep '((Tammy . 1969) (Jason . 1985) (Alan . 1968)))
 (famTreep '((Tammy . 1969) (Jason . 1985) ((Glenn . 1930) (Alan . 1968) (Liz . 1932))))
 
-;; getRootYear: famTree -> int
-;;
+;; getRootYear: famTree ->  nat
+;; Returns a natural number representing the earliest year within a famTree
 (definec getRootYear (a :famTree) :nat
   (cond
    ((personp ft) (rest ft))
